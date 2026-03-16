@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chaaga Counter</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding-top: 20px; }
+    button { font-size: 1.5rem; padding: 10px 20px; cursor: pointer; }
+    #scores ul { list-style: none; padding: 0; }
+    #scores li { font-size: 1.2rem; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>Button smashers</h1>
+  <button id="click-btn">Click Me!</button>
+  <h2>Scores:</h2>
+  <div id="scores">No one has clicked yet.</div>
+
+  <script>
+    let userId = null;
+    const scores = {};
+    const clickBtn = document.getElementById('click-btn');
+    const scoresDiv = document.getElementById('scores');
+
+    function renderScores() {
+      scoresDiv.innerHTML = '';
+      const userScores = [];
+      for (const key in scores) {
+        if (key.startsWith('count_')) {
+          const uid = key.substring(6);
+          const userName = scores['username_'+uid] || uid;
+          userScores.push({ name: userName, score: scores[key] });
+        }
+      }
+
+      if (userScores.length === 0) {
+        scoresDiv.innerText = 'No one has clicked yet.';
+        return;
+      }
+
+      const ul = document.createElement('ul');
+      userScores.sort((a, b) => b.score - a.score); // Sort by score descending
+      userScores.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item.name+': '+item.score;
+        ul.appendChild(li);
+      });
+      scoresDiv.appendChild(ul);
+    }
+
+    async function incrementCounter() {
+      const userKey ='count_'+userId;
+      const currentCount = parseInt(scores[userKey] || '0');
+      const newCount = String(currentCount + 1);
+      scores[userKey] = newCount;
+      renderScores();
+    }
+
+
+    async function main() {
+      document.querySelector('#click-btn').addEventListener('click', incrementCounter);
+      userId = "me";
+    }
+    main();
+  </script>
+</body>
+</html>
